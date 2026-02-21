@@ -1,4 +1,4 @@
-﻿-- 001_init.sql
+-- 001_init.sql
 CREATE EXTENSION IF NOT EXISTS timescaledb;
 
 CREATE TABLE IF NOT EXISTS nodes (

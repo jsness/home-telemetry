@@ -63,3 +63,7 @@ coverage.txt
 # Misc
 *.tmp
 *.bak
+
+.gitconfig
+
+.gitconfig-safe

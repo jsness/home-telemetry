@@ -1,0 +1,48 @@
+﻿$ErrorActionPreference = 'Stop'
+
+$root = Split-Path -Parent $PSScriptRoot
+$envPath = Join-Path $root '.env'
+
+if (Test-Path $envPath) {
+  Get-Content $envPath | ForEach-Object {
+    if ($_ -match '^\s*#' -or $_ -match '^\s*$') { return }
+    $parts = $_ -split '=', 2
+    if ($parts.Length -eq 2) {
+      $name = $parts[0].Trim()
+      $value = $parts[1].Trim()
+      [System.Environment]::SetEnvironmentVariable($name, $value)
+    }
+  }
+}
+
+Write-Host 'Starting TimescaleDB...'
+Push-Location $root
+try {
+  docker compose up -d
+} finally {
+  Pop-Location
+}
+
+Write-Host 'Generating certs (if missing)...'
+$certDir = Join-Path $root 'server\certs'
+$certPath = Join-Path $certDir 'localhost-cert.pem'
+$keyPath = Join-Path $certDir 'localhost-key.pem'
+if (-not (Test-Path $certPath) -or -not (Test-Path $keyPath)) {
+  & (Join-Path $root 'server\scripts\gen-cert.ps1')
+}
+
+Write-Host 'Running migrations...'
+Push-Location (Join-Path $root 'server')
+try {
+  go run .\cmd\migrate
+} finally {
+  Pop-Location
+}
+
+Write-Host 'Starting server...'
+Push-Location (Join-Path $root 'server')
+try {
+  go run .\cmd\server
+} finally {
+  Pop-Location
+}

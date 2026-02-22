@@ -1,4 +1,4 @@
-﻿$ErrorActionPreference = 'Stop'
+$ErrorActionPreference = 'Stop'
 
 $root = Split-Path -Parent $PSScriptRoot
 $envPath = Join-Path $root '.env'
@@ -39,10 +39,16 @@ try {
   Pop-Location
 }
 
-Write-Host 'Starting server...'
-Push-Location (Join-Path $root 'server')
-try {
-  go run .\cmd\server
-} finally {
-  Pop-Location
-}
+Write-Host 'Starting server (new window)...'
+Start-Process -FilePath powershell -ArgumentList @(
+  '-NoProfile',
+  '-Command',
+  "Set-Location '$root\\server'; go run .\\cmd\\server"
+)
+
+Write-Host 'Starting web app (new window)...'
+Start-Process -FilePath powershell -ArgumentList @(
+  '-NoProfile',
+  '-Command',
+  "Set-Location '$root\\web'; npm run dev"
+)

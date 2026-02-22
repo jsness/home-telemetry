@@ -34,7 +34,7 @@ if (-not (Test-Path $certPath) -or -not (Test-Path $keyPath)) {
 Write-Host 'Running migrations...'
 Push-Location (Join-Path $root 'server')
 try {
-  go run .\cmd\migrate
+  go run github.com/jsness/go-migrate-lite/cmd/migrate-lite
 } finally {
   Pop-Location
 }

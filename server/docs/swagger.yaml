@@ -1,0 +1,207 @@
+basePath: /api/v1
+definitions:
+  home-telemetry_server_internal_store.Node:
+    properties:
+      id:
+        type: string
+      last_seen:
+        type: string
+      meta:
+        additionalProperties:
+          type: string
+        type: object
+      name:
+        type: string
+    type: object
+  home-telemetry_server_internal_types.CPUMetrics:
+    properties:
+      cores:
+        type: integer
+      freq_mhz:
+        type: number
+      load_avg:
+        type: number
+      temp_c:
+        type: number
+      usage_pct:
+        type: number
+    type: object
+  home-telemetry_server_internal_types.GPUMetrics:
+    properties:
+      mem_used_mb:
+        type: number
+      name:
+        type: string
+      power_w:
+        type: number
+      temp_c:
+        type: number
+      usage_pct:
+        type: number
+    type: object
+  home-telemetry_server_internal_types.IngestPayload:
+    properties:
+      cpu:
+        $ref: '#/definitions/home-telemetry_server_internal_types.CPUMetrics'
+      gpus:
+        items:
+          $ref: '#/definitions/home-telemetry_server_internal_types.GPUMetrics'
+        type: array
+      node_id:
+        type: string
+      tags:
+        additionalProperties:
+          type: string
+        type: object
+      timestamp:
+        type: string
+    type: object
+  home-telemetry_server_internal_types.MetricRow:
+    properties:
+      labels:
+        additionalProperties:
+          type: string
+        type: object
+      metric:
+        type: string
+      time:
+        type: string
+      value:
+        type: number
+    type: object
+info:
+  contact: {}
+  description: Ingest and query home telemetry metrics.
+  title: Home Telemetry API
+  version: 0.1.0
+paths:
+  /ingest:
+    post:
+      consumes:
+      - application/json
+      description: Accepts a single metrics payload.
+      parameters:
+      - description: Ingest payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/home-telemetry_server_internal_types.IngestPayload'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Ingest metrics
+      tags:
+      - ingest
+  /metrics:
+    get:
+      parameters:
+      - description: Node ID
+        in: query
+        name: node_id
+        required: true
+        type: string
+      - description: Metric name
+        in: query
+        name: metric
+        type: string
+      - description: RFC3339 time
+        in: query
+        name: from
+        type: string
+      - description: RFC3339 time
+        in: query
+        name: to
+        type: string
+      - description: Max rows (default 1000)
+        in: query
+        name: limit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              items:
+                $ref: '#/definitions/home-telemetry_server_internal_types.MetricRow'
+              type: array
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Query metrics
+      tags:
+      - metrics
+  /nodes:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/home-telemetry_server_internal_store.Node'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: List nodes
+      tags:
+      - nodes
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

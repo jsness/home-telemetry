@@ -1,4 +1,4 @@
-﻿package api
+package api
 
 import (
 	"encoding/json"
@@ -39,14 +39,14 @@ func (h *Handler) Routes() http.Handler {
 		_, _ = w.Write([]byte("ok"))
 	})
 
-	r.Route("/api/v1", func(r chi.Router) {
-		r.Use(auth.TokenMiddleware(h.cfg.AuthToken))
-
-		r.Post("/ingest", h.handleIngest)
+		r.Route("/api/v1", func(r chi.Router) {
+		// Public read endpoints for UI
 		r.Get("/nodes", h.handleNodes)
 		r.Get("/metrics", h.handleMetrics)
-	})
 
+		// Protected ingest endpoint
+		r.With(auth.TokenMiddleware(h.cfg.AuthToken)).Post("/ingest", h.handleIngest)
+	})
 	return r
 }
 

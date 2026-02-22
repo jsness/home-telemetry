@@ -9,8 +9,6 @@ type Node = {
   meta?: Record<string, string>;
 };
 
-const AUTH_TOKEN = "dev-token";
-
 const App = () => {
   const [nodes, setNodes] = useState<Node[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -18,11 +16,7 @@ const App = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch(`/api/v1/nodes`, {
-          headers: {
-            Authorization: `Bearer ${AUTH_TOKEN}`
-          }
-        });
+        const res = await fetch(`/api/v1/nodes`);
         if (!res.ok) {
           throw new Error(`Request failed: ${res.status}`);
         }

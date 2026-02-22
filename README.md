@@ -59,4 +59,31 @@ go run .\cmd\migrate
 
 `powershell
 .\\scripts\\gen-swagger.ps1
-`\n
+`
+## Agent (Windows + NVIDIA)
+
+### Prereqs
+- NVIDIA drivers + `nvidia-smi` on PATH
+- LibreHardwareMonitor (LHM) for CPU temperature
+  - Enable LHM web server (default: `http://localhost:8085/data.json`)
+
+### Run (one-off, print only)
+```powershell
+cd C:\dev\home-telemetry\agent
+go run .\cmd\agent --once --print-only --lhm-url http://localhost:8085/data.json
+```
+
+### Run (continuous)
+```powershell
+cd C:\dev\home-telemetry\agent
+go run .\cmd\agent --server https://localhost:8443 --token dev-token --interval 5s --lhm-url http://localhost:8085/data.json
+```
+
+### Env / Flags
+- `SERVER_URL` / `--server`
+- `AUTH_TOKEN` / `--token`
+- `NODE_ID` / `--node`
+- `INTERVAL` / `--interval`
+- `LHM_URL` / `--lhm-url` (CPU temp source)
+- `--once` (collect once and exit)
+- `--print-only` (print payload, do not send)

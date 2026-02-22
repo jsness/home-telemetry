@@ -1,4 +1,4 @@
-﻿package types
+package types
 
 import "time"
 
@@ -11,16 +11,16 @@ type IngestPayload struct {
 }
 
 type CPUMetrics struct {
-	TempC    float64 `json:"temp_c"`
+	TempC    float64 `json:"temp_c,omitempty"`
 	UsagePct float64 `json:"usage_pct"`
-	LoadAvg  float64 `json:"load_avg"`
+	LoadAvg  float64 `json:"load_avg,omitempty"`
 	FreqMHz  float64 `json:"freq_mhz,omitempty"`
 	Cores    int     `json:"cores,omitempty"`
 }
 
 type GPUMetrics struct {
 	Name      string  `json:"name"`
-	TempC     float64 `json:"temp_c"`
+	TempC    float64 `json:"temp_c,omitempty"`
 	UsagePct  float64 `json:"usage_pct"`
 	MemUsedMB float64 `json:"mem_used_mb"`
 	PowerW    float64 `json:"power_w"`
